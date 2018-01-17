@@ -1,0 +1,11 @@
+#!/bin/bash
+source /etc/profile
+service dhcpd start
+sleep 1
+DHCP_STATUS=$(service dhcpd status|grep "running..." | wc -l)
+if [ $DHCP_STATUS -eq 1 ];then
+    echo "DHCP服务启动成功";
+    java -jar -Dspring.config.location=/opt/app/config/application.properties "/opt/app/ads.jar"
+else
+    echo "DHCP服务启动失败";
+fi
