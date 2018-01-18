@@ -1,25 +1,29 @@
 #!/bin/bash
 
-file_path=/home/install
+file_path=/home/file/install
 
-## 版本号
+## svn 基础地址
 svn_url=$1
+## 版本号
 version=$2
+## 构建号
 build=$3
 
-cd image_build/ads
-./install.sh
-cd ../../
-cd image_build/ads-ui
-./install.sh
-cd ../../
 date=`date +%Y%m%d`
 outFileName="RG_ONC_APPS_ADS_"${version}"_Build"${build}".tar.gz"
 fileName="rgonc-ads.tar.gz"
 SVN_URI=${svn_url}
 SVN_USERNAME="panzibin"
 SVN_PASSWORD="pzb.328942829"
-svn co ${SVN_URI} --username ${SVN_USERNAME} --password ${SVN_PASSWORD} --no-auth-cache
+
+cd image_build/ads
+./install.sh ${SVN_URI}'/ads' ${SVN_USERNAME} ${SVN_PASSWORD}
+cd ../../
+cd image_build/ads-ui
+./install.sh ${SVN_URI}'/ads-ui' ${SVN_USERNAME} ${SVN_PASSWORD}
+cd ../../
+
+svn co ${SVN_URI}'/ads' --username ${SVN_USERNAME} --password ${SVN_PASSWORD} --no-auth-cache
 cp -r ads/src/main/resources/script/* ads/deploy/install_package/data/script/
 cp -r ads/src/main/resources/database/* ads/deploy/install_package/database/
 mv  ads/deploy/install_package  ads/deploy/ads

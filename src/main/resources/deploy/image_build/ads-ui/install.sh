@@ -1,8 +1,8 @@
 #!/bin/bash
 echo "开始编译ads-ui镜像"
-SVN_URI="http://svn.ruijie.net/svn/soft-code/CP/CustomMade/ONC-ADS/branches/ADS_1.10/ads-ui"
-SVN_USERNAME="panzibin"
-SVN_PASSWORD="pzb.328942829"
+SVN_URI=$1
+SVN_USERNAME=$2
+SVN_PASSWORD=$3
 echo "开始下载svn代码，代码路径： ${SVN_URI}"
 export SRC_DIR=`basename $SVN_URI`
 mkdir src

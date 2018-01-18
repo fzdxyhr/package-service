@@ -1,22 +1,31 @@
 #!/bin/bash
 
-## 版本号
-version=1.20
+file_path=/home/file/upgrade
 
-cd image_build/ads
-./install.sh
-cd ../../
-cd image_build/ads-ui
-./install.sh
-cd ../../
-#date=`date +%Y%m%d%H%M%S`
+## svn 基础地址
+svn_url=$1
+## 版本号
+version=$2
+## 构建号
+build=$3
+
 date=`date +%Y%m%d`
-outFileName="RG_ONC_APPS_ADS_"$version"_Build"$date"_Upgrade_Up.tar.gz"
+outFileName="RG_ONC_APPS_ADS_"${version}"_Build"${date}"_Upgrade.tar.gz"
 fileName="rgonc-ads.tar.gz"
-SVN_URI="http://svn.ruijie.net/svn/soft-code/CP/CustomMade/ONC-ADS/branches/ADS_1.10/ads"
+SVN_URI=${svn_url}
 SVN_USERNAME="panzibin"
 SVN_PASSWORD="pzb.328942829"
-svn co ${SVN_URI} --username ${SVN_USERNAME} --password ${SVN_PASSWORD} --no-auth-cache
+
+cd image_build/ads
+./install.sh ${SVN_URI}'/ads' ${SVN_USERNAME} ${SVN_PASSWORD}
+cd ../../
+cd image_build/ads-ui
+./install.sh ${SVN_URI}'/ads-ui' ${SVN_USERNAME} ${SVN_PASSWORD}
+cd ../../
+
+#date=`date +%Y%m%d%H%M%S`
+
+svn co ${SVN_URI}'ads' --username ${SVN_USERNAME} --password ${SVN_PASSWORD} --no-auth-cache
 cp -r ads/src/main/resources/script/* ads/deploy/update_package/data/script/
 cp -r ads/src/main/resources/updatesql/* ads/deploy/update_package/updatesql/
 mv  ads/deploy/update_package  ads/deploy/ads
