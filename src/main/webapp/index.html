@@ -53,10 +53,36 @@
             <p>菜鸟教程是一个提供最新的web技术站点，本站免费提供了建站相关的技术文档，帮助广大web技术爱好者快速入门并建立自己的网站。菜鸟先飞早入行——学的不仅是技术，更是梦想。</p>
         </div>
         <div class="tab-pane fade" id="install">
-            <p>{{ aa }}</p>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>安装包名称</th><th>路径</th><th>操作</th>
+                </tr>
+                </thead>
+                <tbody v-for="install in install_items">
+                <tr style="background-color: rgba(8, 21, 29, 0.8);">
+                    <td>{{install.file_name}}</td>
+                    <td>{{install.file_path}}</td>
+                    <td><a :href="install.file_path">下载</a></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
         <div class="tab-pane fade" id="upgrade">
-            <p>{{ bb }}</p>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>升级包名称</th><th>路径</th><th>操作</th>
+                </tr>
+                </thead>
+                <tbody v-for="upgrade in upgrade_items">
+                    <tr style="background-color: rgba(8, 21, 29, 0.8);">
+                        <td>{{upgrade.file_name}}</td>
+                        <td>{{upgrade.file_path}}</td>
+                        <td><a :href="upgrade.file_path">下载</a></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -64,19 +90,47 @@
     $(function () {
         $('#myTab li:eq(0) a').tab('show');
     });
-    var demo=new Vue({
-        el:'#main',
-        data:{
-            aa:"安装",
-            bb:"升级",
-            status:false
+    var demo = new Vue({
+        el: '#main',
+        data: {
+            aa: "安装",
+            bb: "升级",
+            status: false,
+            upgrade_items: [
+                {
+                    file_name: "aaaa",
+                    file_path: "d:/aa/aa/aa"
+                },
+                {
+                    file_name: "bbbb",
+                    file_path: "d:/bb/bb/bb"
+                },
+                {
+                    file_name: "cccc",
+                    file_path: "d:/cc/cc/cc"
+                }
+            ],
+            install_items: [
+                {
+                    file_name: "aaaa",
+                    file_path: "d:/aa/aa/aa"
+                },
+                {
+                    file_name: "bbbb",
+                    file_path: "d:/bb/bb/bb"
+                },
+                {
+                    file_name: "cccc",
+                    file_path: "d:/cc/cc/cc"
+                }
+            ]
         },
-        methods:{
-            hide:function(){
-                this.status=false;
+        methods: {
+            hide: function () {
+                this.status = false;
             },
-            toggle:function(){
-                this.status=!this.status;
+            toggle: function () {
+                this.status = !this.status;
             }
         }
     });
