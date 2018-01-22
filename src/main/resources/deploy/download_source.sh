@@ -12,7 +12,7 @@ MODULE_ADS_UI=ads-ui
 ADS_SVN_PATH=${SOURCE_PATH}'/'${MODULE_ADS}
 ADS_UI_SVN_PATH=${SOURCE_PATH}'/'${MODULE_ADS_UI}
 
-if [[ -d ${SOURCE_PATH} ]];then
+if [[ ! -d ${SOURCE_PATH} ]];then
     echo "下载文件目录不存在，创建目录${SOURCE_PATH}"
     mkdir -p ${SOURCE_PATH}
 fi
