@@ -11,5 +11,5 @@ public class CommonContant {
 
     public final static String FILE_UPGRADE_PATH = "/home/file/upgrade";
 
-    public final static String LOG_PATH = "/home/install";
+    public final static String LOG_PATH = "/usr/local/tomcat8.0/logs";
 }

@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface PackageService {
 
-    String packageStart(String svnUrl, String build, String version);
+    String packageStart(String svnUrl, String build, String version,List<Integer> packageTypes);
 
     List<FileVo> listFiles(Integer packageType);
 

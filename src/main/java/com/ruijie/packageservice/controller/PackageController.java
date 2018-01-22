@@ -22,8 +22,7 @@ public class PackageController {
 
     @RequestMapping(value = "/package_start", method = RequestMethod.GET)
     public String packageStart(@RequestBody PackageVo packageVo) {
-
-        return "success";
+        return packageService.packageStart(packageVo.getSvnUrl(), packageVo.getBuild(), packageVo.getVersion(), packageVo.getPackageType());
     }
 
     @RequestMapping(value = "/files/{package_type}", method = RequestMethod.GET)
