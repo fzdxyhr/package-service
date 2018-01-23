@@ -28,9 +28,11 @@ public class PackageController {
     @Autowired
     private PackageService packageService;
 
-    @RequestMapping(value = "/package_start", method = RequestMethod.GET)
+    @RequestMapping(value = "/package_start", method = RequestMethod.POST)
     public String packageStart(@RequestBody PackageVo packageVo) {
-        return packageService.packageStart(packageVo.getSvnUrl(), packageVo.getBuild(), packageVo.getVersion(), packageVo.getPackageType());
+        System.out.println(packageVo);
+        return null;
+//        return packageService.packageStart(packageVo.getSvnUrl(), packageVo.getBuild(), packageVo.getVersion(), packageVo.getPackageType());
     }
 
     @RequestMapping(value = "/files/{package_type}", method = RequestMethod.GET)
