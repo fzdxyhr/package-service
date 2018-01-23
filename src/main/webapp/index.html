@@ -10,34 +10,55 @@
     <style>
         body {
             color: white;
+            background: url("image/back.jpg") repeat-y center top;
+        }
+
+        .input_class {
+            background-color: rgba(16, 27, 29, 0.5);
+            color: white;
+            border-color: rgba(16, 27, 29, 0.5);
         }
     </style>
 </head>
 <body>
-<div style="position:absolute; width:100%; height:100%; z-index:-1">
-    <img src="image/back.jpg" height="100%" width="100%"/>
-</div>
-<div align="center" style="margin-bottom: 5%;margin-top: -18px;">
+<!--<div style="position:absolute; width:100%; height:100%; z-index:-1">-->
+    <!--<img src="image/back.jpg" height="100%" width="100%"/>-->
+<!--</div>-->
+<div align="center" style="margin-bottom: 5%;margin-top: 5px;">
     <h2>ADS打包平台</h2>
 </div>
 <div id="main">
     <form role="form">
         <div class="form-group" style="margin-left: 35%;">
             <label for="svn_url">SVN地址:</label>
-            <input type="text" class="form-control input-sm" style="width: 45%;" id="svn_url" placeholder="请输入SVN地址">
+            <input type="text" class="form-control input-sm input_class" style="width: 45%;" id="svn_url" v-model="svn_url"
+                   placeholder="请输入SVN地址">
         </div>
         <div class="form-group" style="margin-left: 35%;">
             <label for="build">Build:</label>
-            <input type="text" class="form-control input-sm" style="width: 45%;margin-bottom:3px;" id="build"
-                   placeholder="请输入Build号">
+            <input type="text" class="form-control input-sm input_class" style="width: 45%;margin-bottom:3px;"
+                   id="build"
+                   placeholder="请输入Build号" v-model="build">
         </div>
         <div class="form-group" style="margin-left: 35%;">
             <label for="version">Version:</label>
-            <input type="text" class="form-control input-sm" style="width: 45%;margin-bottom:3px;" id="version"
-                   placeholder="请输入version号">
+            <input type="text" class="form-control input-sm input_class" style="width: 45%;margin-bottom:3px;"
+                   id="version"
+                   placeholder="请输入version号" v-model="version">
         </div>
-        <div class="form-group" align="center">
-            <button type="submit" class="btn btn-default">开始打包</button>
+        <div class="form-group" style="margin-left: 35%;">
+            <label style="display: inline-block;">
+                打包类型:
+            </label>
+            <label class="radio" style="display: inline-block;margin-left: 40px;color: red;">
+                <input type="radio" name="optionsRadios" id="optionsRadios1" value="1" v-model="packageType" :checked="packageType == 1"> 安装包
+            </label>
+            <label class="radio" style="display: inline-block;margin-left: 35px;color: red;">
+                <input type="radio" name="optionsRadios" id="optionsRadios2" value="2" v-model="packageType" :checked="packageType == 2">升级包
+            </label>
+            <button type="button" class="btn btn-default input_class" @click="startPackage" style="display: inline-block;margin-left: 14.7%;"
+                    :disabled="startPackageDisable">开始打包
+            </button>
         </div>
     </form>
     <ul id="myTab" class="nav nav-tabs">
@@ -50,87 +71,217 @@
     </ul>
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade in active" id="log">
-            <p>菜鸟教程是一个提供最新的web技术站点，本站免费提供了建站相关的技术文档，帮助广大web技术爱好者快速入门并建立自己的网站。菜鸟先飞早入行——学的不仅是技术，更是梦想。</p>
+            <textarea style="background-color: rgba(8, 21, 29, 0.7); color:white; margin-top: 10px; margin-left:5px; width: 99.3%;"
+                    class="form-control" rows="15" v-model="log_content" disabled="true" placeholder="暂无日志"></textarea>
         </div>
         <div class="tab-pane fade" id="install">
             <table class="table table-striped">
-                <thead>
+                <thead v-show="install_items.length > 0">
                 <tr>
-                    <th>安装包名称</th><th>路径</th><th>操作</th>
+                    <th>安装包名称</th>
+                    <th>安装包路径</th>
+                    <th>安装包大小</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
-                <tbody v-for="install in install_items">
-                <tr style="background-color: rgba(8, 21, 29, 0.8);">
+                <tbody v-for="install in install_items" v-show="install_items.length > 0">
+                <tr style="background-color: rgba(8, 21, 29, 0.7);">
                     <td>{{install.file_name}}</td>
                     <td>{{install.file_path}}</td>
-                    <td><a :href="install.file_path">下载</a></td>
+                    <td>{{install.file_size}}MB</td>
+                    <td>{{install.file_date}}</td>
+                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
                 </tr>
                 </tbody>
             </table>
+            <div v-show="install_items.length == 0">
+                <div align="center" style="margin-top: 10%;">暂无数据</div>
+            </div>
         </div>
         <div class="tab-pane fade" id="upgrade">
             <table class="table table-striped">
-                <thead>
+                <thead v-show="upgrade_items.length > 0">
                 <tr>
-                    <th>升级包名称</th><th>路径</th><th>操作</th>
+                    <th>升级包名称</th>
+                    <th>升级包路径</th>
+                    <th>升级包大小</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
-                <tbody v-for="upgrade in upgrade_items">
-                    <tr style="background-color: rgba(8, 21, 29, 0.8);">
-                        <td>{{upgrade.file_name}}</td>
-                        <td>{{upgrade.file_path}}</td>
-                        <td><a :href="upgrade.file_path">下载</a></td>
-                    </tr>
+                <tbody v-for="upgrade in upgrade_items" v-show="upgrade_items.length > 0">
+                <tr style="background-color: rgba(8, 21, 29, 0.7);">
+                    <td>{{upgrade.file_name}}</td>
+                    <td>{{upgrade.file_path}}</td>
+                    <td>{{upgrade.file_size}}MB</td>
+                    <td>{{upgrade.file_date}}</td>
+                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
+                </tr>
                 </tbody>
             </table>
+            <div v-show="upgrade_items.length == 0">
+                <div align="center" style="margin-top: 10%;">暂无数据</div>
+            </div>
         </div>
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: rgba(8, 21, 28, 0.6);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">{{ content }}</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
     </div>
 </div>
 <script>
     $(function () {
         $('#myTab li:eq(0) a').tab('show');
     });
-    var demo = new Vue({
+    var vue = new Vue({
         el: '#main',
         data: {
-            aa: "安装",
-            bb: "升级",
+            svn_url:"",
+//            build:"",
+            version:"",
+            packageType:1,
+            content:"",
+            queryLogJobId: 0,
+            queryInstallJobId: 0,
+            queryUpgradeJobId: 0,
+            startPackageDisable: false,
+            log_content: "",
             status: false,
-            upgrade_items: [
-                {
-                    file_name: "aaaa",
-                    file_path: "d:/aa/aa/aa"
-                },
-                {
-                    file_name: "bbbb",
-                    file_path: "d:/bb/bb/bb"
-                },
-                {
-                    file_name: "cccc",
-                    file_path: "d:/cc/cc/cc"
-                }
-            ],
-            install_items: [
-                {
-                    file_name: "aaaa",
-                    file_path: "d:/aa/aa/aa"
-                },
-                {
-                    file_name: "bbbb",
-                    file_path: "d:/bb/bb/bb"
-                },
-                {
-                    file_name: "cccc",
-                    file_path: "d:/cc/cc/cc"
-                }
-            ]
+            upgrade_items: [],
+            install_items: []
+        },
+        computed:{
+            build : function(){
+                let date = new Date();
+                return this.formatDate(date,"yyyyMMdd");
+            }
         },
         methods: {
-            hide: function () {
-                this.status = false;
+            validateInput:function(){
+                let self = this;
+                if (self.svn_url === ''){
+                    self.content = "请输入SVN地址";
+                    $('#myModal').modal('show');
+                    return false;
+                }
+                if (!self.isUrl(self.svn_url)){
+                    self.content = "SVN地址不合法，请检验后重新输入";
+                    $('#myModal').modal('show');
+                    return false;
+                }
+                if (self.build === ''){
+                    self.content = "请输入Build号";
+                    $('#myModal').modal('show');
+                    return false;
+                }
+                if (self.version === ''){
+                    self.content = "请输入version号";
+                    $('#myModal').modal('show');
+                    return false;
+                }
+                return true;
             },
-            toggle: function () {
-                this.status = !this.status;
+            startPackage: function () {
+                let self = this;
+                if(!self.validateInput()) {
+                    return;
+                }
+                self.startPackageDisable = true;
+                self.queryLogTimeTask();
+                self.queryUpgradePackage();
+                self.queryInstallPackage();
+            },
+            queryLogTimeTask: function () {
+                let self = this;
+                self.queryLogJobId = window.setInterval(function () {
+                    self.queryLogs();
+                }, 5000);
+            },
+            queryLogs: function () {
+                let self = this;
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/logs",
+                    success: function (data) {
+                        self.log_content = data;
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
+            queryInstallPackage: function () {
+                let self = this;
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/files/1",
+                    success: function (data) {
+                        self.install_items = data;
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
+            queryUpgradePackage: function () {
+                let self = this;
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/files/2",
+                    success: function (data) {
+//                        var message = $.parseJSON(data);//后台返回的json数据需要转为对象
+                        self.upgrade_items = data;
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
+            downloadFile: function (path) {
+                window.location = "/v1/files/download?path=" + path;
+            },
+            isUrl:function(str_url){
+                var urlRegExp=/^((https|http|ftp|rtsp|mms)?:\/\/)+[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/;
+                if (urlRegExp.test(str_url)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            formatDate:function(date, fmt){
+                let self = this;
+                if (/(y+)/.test(fmt)) {
+                    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+                }
+                let o = {
+                    'M+': date.getMonth() + 1,
+                    'd+': date.getDate(),
+                    'h+': date.getHours(),
+                    'm+': date.getMinutes(),
+                    's+': date.getSeconds()
+                };
+                for (let k in o) {
+                    if (new RegExp(`(${k})`).test(fmt)) {
+                        let str = o[k] + '';
+                        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : self.padLeftZero(str));
+                    }
+                }
+                return fmt;
+            },
+            padLeftZero:function(str){
+                return ('00' + str).substr(str.length);
             }
         }
     });

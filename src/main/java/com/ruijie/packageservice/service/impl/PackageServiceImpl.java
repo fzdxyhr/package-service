@@ -1,5 +1,6 @@
 package com.ruijie.packageservice.service.impl;
 
+import com.google.common.collect.Ordering;
 import com.ruijie.packageservice.constant.CommonContant;
 import com.ruijie.packageservice.constant.PackageType;
 import com.ruijie.packageservice.service.PackageService;
@@ -11,8 +12,9 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.SimpleFormatter;
 
 /**
  * @author yhr
@@ -23,6 +25,10 @@ import java.util.List;
 @Service
 @Slf4j
 public class PackageServiceImpl implements PackageService {
+
+    public static final Integer LOG_SIZE = 300;
+
+    public SimpleDateFormat simpleFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
     @Override
@@ -77,10 +83,18 @@ public class PackageServiceImpl implements PackageService {
                 log.error("指定的路径不是个文件夹");
             } else if (rootFile.isDirectory()) {
                 File[] fileList = rootFile.listFiles();
+                Arrays.sort(fileList, new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        return new Long(o2.lastModified()).intValue() - new Long(o1.lastModified()).intValue();
+                    }
+                });
                 for (File file : fileList) {
                     FileVo fileVo = new FileVo();
                     fileVo.setFileName(file.getName());
+                    fileVo.setFileDate(simpleFormatter.format(new Date(file.lastModified())));
                     fileVo.setFilePath(file.getPath());
+                    fileVo.setFileSize(file.length() / 1024 / 1024);
                     result.add(fileVo);
                 }
             }
@@ -92,17 +106,23 @@ public class PackageServiceImpl implements PackageService {
 
     @Override
     public String readLogs() {
-        try {
-            File logFile = new File(CommonContant.LOG_PATH + "/catalina.out");
+        try {//D:\installsoftware\apache-tomcat-7.0.65-windows-x64\apache-tomcat-7.0.65\logs
+//            File logFile = new File(CommonContant.LOG_PATH + "/catalina.out");
+            File logFile = new File("D:\\installsoftware\\apache-tomcat-7.0.65-windows-x64\\apache-tomcat-7.0.65\\logs\\catalina.out");
             StringBuffer result = new StringBuffer();
             if (logFile.exists()) {
                 //读取文件信息
                 InputStream is = new FileInputStream(logFile);
                 InputStreamReader isr = new InputStreamReader(is);
                 BufferedReader br = new BufferedReader(isr);
-                String readLine = "";
+                String readLine;
+                int count = 1;
                 while ((readLine = br.readLine()) != null) {
-                    result.append(readLine);
+                    result.append(readLine + "\r\n");
+                    if (count > LOG_SIZE) {
+                        break;
+                    }
+                    count++;
                 }
                 return result.toString();
             }

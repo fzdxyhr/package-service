@@ -11,8 +11,12 @@ import lombok.Data;
 @Data
 public class FileVo {
 
-    public String fileName;
+    private String fileName;
 
-    public String filePath;
+    private String filePath;
+
+    private double fileSize;
+
+    private String fileDate;
 
 }
