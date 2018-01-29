@@ -32,7 +32,6 @@ public class PackageServiceImpl implements PackageService {
 
     public SimpleDateFormat simpleFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
     @Override
     public String packageStart(final String svnUrl, final String build, final String version, List<Integer> packageTypes) {
         if (!CollectionUtils.isEmpty(packageTypes)) {
