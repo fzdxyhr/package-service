@@ -116,7 +116,7 @@ public class PackageServiceImpl implements PackageService {
     @Override
     public String readLogs() {
         try {//D:\installsoftware\apache-tomcat-7.0.65-windows-x64\apache-tomcat-7.0.65\logs
-            File logFile = new File(CommonContant.LOG_PATH + "/catalina.out");
+            File logFile = new File(CommonContant.LOG_PATH);
 //            File logFile = new File("D:\\installsoftware\\apache-tomcat-7.0.65-windows-x64\\apache-tomcat-7.0.65\\logs\\catalina.out");
             StringBuffer result = new StringBuffer();
             if (logFile.exists()) {
