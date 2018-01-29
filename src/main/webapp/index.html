@@ -156,11 +156,13 @@
             queryLogJobId: 0,
             queryInstallJobId: 0,
             queryUpgradeJobId: 0,
+            queryResultJobId:0,
             startPackageDisable: false,
             log_content: "",
             status: false,
             upgrade_items: [],
-            install_items: []
+            install_items: [],
+            resultObj:{}
         },
         computed:{
             build : function(){
@@ -222,9 +224,11 @@
                 }
                 self.startPackageDisable = true;
                 self.runPackage();
+                self.queryLogs();
                 self.queryLogTimeTask();
-                self.queryUpgradePackage();
-                self.queryInstallPackage();
+                self.queryUpgradePackageByTime();
+                self.queryInstallPackageByTime();
+                self.queryResultTimeTask();
             },
             queryLogTimeTask: function () {
                 let self = this;
@@ -258,6 +262,12 @@
                     }
                 });
             },
+            queryInstallPackageByTime: function () {
+                let self = this;
+                window.setInterval(function(){
+                    self.queryInstallPackage();
+                },10000);
+            },
             queryUpgradePackage: function () {
                 let self = this;
                 $.ajax({
@@ -271,6 +281,46 @@
                         console.log(error);
                     }
                 });
+            },
+            queryUpgradePackageByTime: function () {
+                let self = this;
+                window.setInterval(function () {
+                    self.queryUpgradePackage();
+                },10000);
+            },
+            queryResult: function () {
+                let self = this;
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/result",
+                    success: function (data) {
+                        self.resultObj = data;
+                        var installResult = false;
+                        var upgradeResult = false;
+                        if(self.resultObj.install_result == 1) {
+                            installResult = true;
+                            window.clearInterval(self.queryInstallJobId);
+                        }
+                        if(self.resultObj.upgrade_result == 1) {
+                            upgradeResult = true;
+                            window.clearInterval(self.queryUpgradeJobId);
+                        }
+                        if(installResult && upgradeResult) {
+                            window.clearInterval(self.queryLogJobId);
+                            window.clearInterval(self.queryResultJobId);
+                        }
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
+            queryResultTimeTask: function () {
+                let self = this;
+                self.queryResultJobId = window.setInterval(function(){
+                    self.queryResult();
+                },10000);
             },
             downloadFile: function (path) {
                 window.location = "/v1/files/download?path=" + path;

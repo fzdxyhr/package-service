@@ -1,11 +1,13 @@
 package com.ruijie.packageservice.service.impl;
 
 import com.google.common.collect.Ordering;
+import com.ruijie.packageservice.constant.CacheHelper;
 import com.ruijie.packageservice.constant.CommonContant;
 import com.ruijie.packageservice.constant.PackageType;
 import com.ruijie.packageservice.service.PackageService;
 import com.ruijie.packageservice.shell.ShellCall;
 import com.ruijie.packageservice.vo.FileVo;
+import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,6 +48,9 @@ public class PackageServiceImpl implements PackageService {
                             params.add(version);
                             int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "make_install.sh", params);
                             log.info("make_install.sh execute result is " + returnResult);
+                            if (CacheHelper.cacheHelp.asMap().get(CacheHelper.INSTALL_RESULT_KEY) == null) {
+                                CacheHelper.cacheHelp.asMap().put(CacheHelper.INSTALL_RESULT_KEY, returnResult);
+                            }
                         }
                     }).start();
                 }
@@ -60,6 +65,9 @@ public class PackageServiceImpl implements PackageService {
                             params.add(version);
                             int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "make_update.sh", params);
                             log.info("make_install.sh execute result is " + returnResult);
+                            if (CacheHelper.cacheHelp.asMap().get(CacheHelper.UPGRADE_RESULT_KEY) == null) {
+                                CacheHelper.cacheHelp.asMap().put(CacheHelper.UPGRADE_RESULT_KEY, returnResult);
+                            }
                         }
                     }).start();
                 }
@@ -107,8 +115,8 @@ public class PackageServiceImpl implements PackageService {
     @Override
     public String readLogs() {
         try {//D:\installsoftware\apache-tomcat-7.0.65-windows-x64\apache-tomcat-7.0.65\logs
-//            File logFile = new File(CommonContant.LOG_PATH + "/catalina.out");
-            File logFile = new File("D:\\installsoftware\\apache-tomcat-7.0.65-windows-x64\\apache-tomcat-7.0.65\\logs\\catalina.out");
+            File logFile = new File(CommonContant.LOG_PATH + "/catalina.out");
+//            File logFile = new File("D:\\installsoftware\\apache-tomcat-7.0.65-windows-x64\\apache-tomcat-7.0.65\\logs\\catalina.out");
             StringBuffer result = new StringBuffer();
             if (logFile.exists()) {
                 //读取文件信息
@@ -130,5 +138,13 @@ public class PackageServiceImpl implements PackageService {
             log.error("", ex);
         }
         return null;
+    }
+
+    @Override
+    public ResultVo getResult() {
+        ResultVo resultVo = new ResultVo();
+        resultVo.setInstallResult(CacheHelper.cacheHelp.asMap().get(CacheHelper.INSTALL_RESULT_KEY) == null ? 0 : Integer.parseInt(CacheHelper.cacheHelp.asMap().get(CacheHelper.INSTALL_RESULT_KEY).toString()));
+        resultVo.setUpgradeResult(CacheHelper.cacheHelp.asMap().get(CacheHelper.UPGRADE_RESULT_KEY) == null ? 0 : Integer.parseInt(CacheHelper.cacheHelp.asMap().get(CacheHelper.UPGRADE_RESULT_KEY).toString()));
+        return resultVo;
     }
 }

@@ -3,6 +3,7 @@ package com.ruijie.packageservice.controller;
 import com.ruijie.packageservice.service.PackageService;
 import com.ruijie.packageservice.vo.FileVo;
 import com.ruijie.packageservice.vo.PackageVo;
+import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +31,7 @@ public class PackageController {
 
     @RequestMapping(value = "/package_start", method = RequestMethod.POST)
     public String packageStart(@RequestBody PackageVo packageVo) {
-        System.out.println(packageVo);
-        return null;
-//        return packageService.packageStart(packageVo.getSvnUrl(), packageVo.getBuild(), packageVo.getVersion(), packageVo.getPackageType());
+        return packageService.packageStart(packageVo.getSvnUrl(), packageVo.getBuild(), packageVo.getVersion(), packageVo.getPackageType());
     }
 
     @RequestMapping(value = "/files/{package_type}", method = RequestMethod.GET)
@@ -43,6 +42,11 @@ public class PackageController {
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
     public String readLogs() {
         return packageService.readLogs();
+    }
+
+    @RequestMapping(value = "/result", method = RequestMethod.GET)
+    public ResultVo getResult() {
+        return packageService.getResult();
     }
 
     @RequestMapping(value = "/files/download", method = RequestMethod.GET)

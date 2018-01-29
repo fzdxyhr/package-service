@@ -12,7 +12,7 @@ version=$2
 build=$3
 
 current_path="$(cd `dirname $0`;pwd)"
-date=`date +%Y%m%d`
+date=`date +%Y%m%d%H%M%S`
 outFileName="RG_ONC_APPS_ADS_"${version}"_Build"${date}"_Upgrade.tar.gz"
 fileName="rgonc-ads.tar.gz"
 SVN_URI=${svn_url}

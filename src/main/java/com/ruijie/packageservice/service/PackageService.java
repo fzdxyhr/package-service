@@ -1,6 +1,7 @@
 package com.ruijie.packageservice.service;
 
 import com.ruijie.packageservice.vo.FileVo;
+import com.ruijie.packageservice.vo.ResultVo;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public interface PackageService {
     List<FileVo> listFiles(Integer packageType);
 
     String readLogs();
+
+    ResultVo getResult();
 
 }
