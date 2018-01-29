@@ -45,6 +45,8 @@ public class PackageServiceImpl implements PackageService {
                             params.add(svnUrl);
                             params.add(build);
                             params.add(version);
+                            log.info("make_install.sh execute result is staring");
+                            log.info("make_install.sh param is" + params);
                             int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "make_install.sh", params);
                             log.info("make_install.sh execute result is " + returnResult);
                             if (CacheHelper.cacheHelp.asMap().get(CacheHelper.INSTALL_RESULT_KEY) == null) {
