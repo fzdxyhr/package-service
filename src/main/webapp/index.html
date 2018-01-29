@@ -206,7 +206,7 @@
                 data.package_type = package_type;
                 $.ajax({
                     type: "POST",
-                    url: "/v1/package_start",
+                    url: "/package/v1/package_start",
                     contentType:"application/json",
                     data: JSON.stringify(data),
                     success: function (data) {
@@ -240,7 +240,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/logs",
+                    url: "/package/v1/logs",
                     success: function (data) {
                         self.log_content = data;
                     },
@@ -253,7 +253,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/files/1",
+                    url: "/package/v1/files/1",
                     success: function (data) {
                         self.install_items = data;
                     },
@@ -272,7 +272,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/files/2",
+                    url: "/package/v1/files/2",
                     success: function (data) {
 //                        var message = $.parseJSON(data);//后台返回的json数据需要转为对象
                         self.upgrade_items = data;
@@ -292,7 +292,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/result",
+                    url: "/package/v1/result",
                     success: function (data) {
                         self.resultObj = data;
                         var installResult = false;
@@ -323,7 +323,7 @@
                 },10000);
             },
             downloadFile: function (path) {
-                window.location = "/v1/files/download?path=" + path;
+                window.location = "/package/v1/files/download?path=" + path;
             },
             isUrl:function(str_url){
                 var urlRegExp=/^((https|http|ftp|rtsp|mms)?:\/\/)+[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/;
