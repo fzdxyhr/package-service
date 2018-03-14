@@ -64,7 +64,10 @@
             <div v-show="install_items.length == 0">
                 <div align="center" style="margin-top: 10%;">暂无数据</div>
             </div>
-            <div style="float: right;">
+            <div style="float: left;margin-top: 22px;font-size: 16px;" v-show="install_items.length > 0">
+                总共&nbsp;&nbsp;{{ install_total }}&nbsp;&nbsp;记录
+            </div>
+            <div style="float: right;" v-show="install_items.length > 0">
                 <ul class="pagination">
                     <li :class=" installDisablePre ? 'disabled':''">
                         <a href="javascript:void(0)" v-show="installDisablePre">上一页</a>
@@ -104,7 +107,10 @@
             <div v-show="upgrade_items.length == 0">
                 <div align="center" style="margin-top: 10%;">暂无数据</div>
             </div>
-            <div style="float: right;">
+            <div style="float: left;margin-top: 22px;font-size: 16px;" v-show="upgrade_items.length > 0">
+                总共&nbsp;&nbsp;{{ total }}&nbsp;&nbsp;记录
+            </div>
+            <div style="float: right;display: inline-block;"  v-show="upgrade_items.length > 0">
                 <ul class="pagination">
                     <li :class=" disablePre ? 'disabled':''">
                         <a href="javascript:void(0)" v-show="disablePre">上一页</a>
@@ -119,6 +125,7 @@
                     </li>
                 </ul>
             </div>
+
         </div>
     </div>
     <!-- 模态框（Modal） -->
