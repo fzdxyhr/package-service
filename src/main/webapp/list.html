@@ -89,21 +89,21 @@
             <div v-show="upgrade_items.length == 0">
                 <div align="center" style="margin-top: 10%;">暂无数据</div>
             </div>
-            <div style="float: right;">
-                <ul class="pagination">
-                    <li :class=" disablePre ? 'disabled':''">
-                        <a href="javascript:void(0)" v-show="disablePre">上一页</a>
-                        <a href="javascript:void(0)" @click="previous" v-show="disablePre == false">上一页</a>
-                    </li>
-                    <li v-for="index in defaultPagesSize" :class="page_no == index ? 'active':''">
-                        <a href="javascript:void(0)" @click="changePageNo(index)">{{ index }}</a>
-                    </li>
-                    <li :class=" disableNext ? 'disabled':''">
-                        <a href="javascript:void(0)" v-show="disableNext">下一页</a>
-                        <a href="javascript:void(0)" @click="next" v-show="disableNext == false">下一页</a>
-                    </li>
-                </ul>
-            </div>
+            <!--<div style="float: right;">-->
+                <!--<ul class="pagination">-->
+                    <!--<li :class=" disablePre ? 'disabled':''">-->
+                        <!--<a href="javascript:void(0)" v-show="disablePre">上一页</a>-->
+                        <!--<a href="javascript:void(0)" @click="previous" v-show="disablePre == false">上一页</a>-->
+                    <!--</li>-->
+                    <!--<li v-for="index in defaultPagesSize" :class="page_no == index ? 'active':''">-->
+                        <!--<a href="javascript:void(0)" @click="changePageNo(index)">{{ index }}</a>-->
+                    <!--</li>-->
+                    <!--<li :class=" disableNext ? 'disabled':''">-->
+                        <!--<a href="javascript:void(0)" v-show="disableNext">下一页</a>-->
+                        <!--<a href="javascript:void(0)" @click="next" v-show="disableNext == false">下一页</a>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</div>-->
         </div>
     </div>
     <!-- 模态框（Modal） -->
@@ -132,7 +132,7 @@
         el: '#main',
         data: {
             page_no: 1,
-            page_size: 1,
+            page_size: 6,
             total: 0,
             pagesSize: 1,
             defaultPagesSize: [1, 2, 3, 4, 5],
@@ -152,16 +152,15 @@
             disablePre: false,
             disableNext: false
         },
+        mounted: function () {
+            this.queryInstallPackage();
+            this.queryUpgradePackage();
+        },
         computed: {
             build: function () {
                 let date = new Date();
                 return this.formatDate(date, "yyyyMMdd");
             }
-        },
-        mounted: function() {
-            let self = this;
-            self.queryInstallPackage();
-            self.queryUpgradePackage();
         },
         methods: {
             previous: function () {
@@ -198,6 +197,16 @@
             changePageNo: function (val) {
                 let self = this;
                 self.page_no = val;
+                if (self.page_no == 1) {
+                    self.disablePre = true;
+                } else {
+                    self.disablePre = false;
+                }
+                if (self.page_no == self.total) {
+                    self.disableNext = true;
+                } else {
+                    self.disableNext = false;
+                }
             },
             queryByNow: function () {
                 let self = this;
@@ -222,7 +231,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/files/1",
+                    url: "/v1/files/1?page_no=" + self.page_no + "&page_size=" + self.page_size,
                     success: function (data) {
                         self.install_items = data;
                     },
@@ -235,7 +244,7 @@
                 let self = this;
                 $.ajax({
                     type: "GET",
-                    url: "/v1/files/2",
+                    url: "/v1/files/2?page_no=" + self.page_no + "&page_size=" + self.page_size,
                     success: function (data) {
                         self.upgrade_items = data;
                         self.total = self.upgrade_items.length;

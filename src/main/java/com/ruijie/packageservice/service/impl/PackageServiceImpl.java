@@ -78,7 +78,7 @@ public class PackageServiceImpl implements PackageService {
     }
 
     @Override
-    public List<FileVo> listFiles(Integer packageType) {
+    public List<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize) {
         List<FileVo> result = new ArrayList<FileVo>();
         try {
             File rootFile = null;
@@ -110,6 +110,11 @@ public class PackageServiceImpl implements PackageService {
         } catch (Exception e) {
             log.error("readfile()   Exception:" + e.getMessage(), e);
         }
+        if (CollectionUtils.isEmpty(result) || result.size() < pageSize) {
+            return result;
+        }
+        int startIndex = (pageNo - 1) * pageSize;
+        result = result.subList(startIndex, startIndex + pageSize);
         return result;
     }
 

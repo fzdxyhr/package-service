@@ -13,9 +13,9 @@ import java.util.List;
  */
 public interface PackageService {
 
-    String packageStart(String svnUrl, String build, String version,List<Integer> packageTypes);
+    String packageStart(String svnUrl, String build, String version, List<Integer> packageTypes);
 
-    List<FileVo> listFiles(Integer packageType);
+    List<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize);
 
     String readLogs();
 

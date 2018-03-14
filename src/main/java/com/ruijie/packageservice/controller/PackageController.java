@@ -35,8 +35,10 @@ public class PackageController {
     }
 
     @RequestMapping(value = "/files/{package_type}", method = RequestMethod.GET)
-    public List<FileVo> listFiles(@PathVariable("package_type") Integer packageType) {
-        return packageService.listFiles(packageType);
+    public List<FileVo> listFiles(@PathVariable("package_type") Integer packageType
+            , @RequestParam(value = "page_no", required = true, defaultValue = "1") Integer pageNo
+            , @RequestParam(value = "page_size", required = true, defaultValue = "10") Integer pageSize) {
+        return packageService.listFiles(packageType, pageNo, pageSize);
     }
 
     @RequestMapping(value = "/logs", method = RequestMethod.GET)
