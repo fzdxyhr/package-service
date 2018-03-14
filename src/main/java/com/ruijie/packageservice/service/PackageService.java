@@ -1,6 +1,7 @@
 package com.ruijie.packageservice.service;
 
 import com.ruijie.packageservice.vo.FileVo;
+import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -15,7 +16,7 @@ public interface PackageService {
 
     String packageStart(String svnUrl, String build, String version, List<Integer> packageTypes);
 
-    List<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize);
+    PagerInfo<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize);
 
     String readLogs();
 

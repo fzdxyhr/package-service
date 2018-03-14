@@ -7,6 +7,7 @@ import com.ruijie.packageservice.constant.PackageType;
 import com.ruijie.packageservice.service.PackageService;
 import com.ruijie.packageservice.shell.ShellCall;
 import com.ruijie.packageservice.vo.FileVo;
+import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,8 +79,9 @@ public class PackageServiceImpl implements PackageService {
     }
 
     @Override
-    public List<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize) {
+    public PagerInfo<FileVo> listFiles(Integer packageType, Integer pageNo, Integer pageSize) {
         List<FileVo> result = new ArrayList<FileVo>();
+        PagerInfo<FileVo> pagerInfo = new PagerInfo<FileVo>();
         try {
             File rootFile = null;
             if (PackageType.INSTALL.getValue() == packageType) {
@@ -110,12 +112,25 @@ public class PackageServiceImpl implements PackageService {
         } catch (Exception e) {
             log.error("readfile()   Exception:" + e.getMessage(), e);
         }
-        if (CollectionUtils.isEmpty(result) || result.size() < pageSize) {
-            return result;
+        pagerInfo.setTotal(result.size());
+        if (CollectionUtils.isEmpty(result)) {
+            pagerInfo.setItems(result);
+            return pagerInfo;
         }
         int startIndex = (pageNo - 1) * pageSize;
-        result = result.subList(startIndex, startIndex + pageSize);
-        return result;
+        int pages = 0;
+        if (result.size() % pageSize == 0) {
+            pages = result.size() / pageSize;
+        } else {
+            pages = result.size() / pageSize + 1;
+        }
+        if (pageNo == pages) {
+            result = result.subList(startIndex, result.size());
+        } else {
+            result = result.subList(startIndex, startIndex + pageSize);
+        }
+        pagerInfo.setItems(result);
+        return pagerInfo;
     }
 
     @Override

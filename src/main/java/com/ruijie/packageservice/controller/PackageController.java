@@ -3,6 +3,7 @@ package com.ruijie.packageservice.controller;
 import com.ruijie.packageservice.service.PackageService;
 import com.ruijie.packageservice.vo.FileVo;
 import com.ruijie.packageservice.vo.PackageVo;
+import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class PackageController {
     }
 
     @RequestMapping(value = "/files/{package_type}", method = RequestMethod.GET)
-    public List<FileVo> listFiles(@PathVariable("package_type") Integer packageType
+    public PagerInfo<FileVo> listFiles(@PathVariable("package_type") Integer packageType
             , @RequestParam(value = "page_no", required = true, defaultValue = "1") Integer pageNo
             , @RequestParam(value = "page_size", required = true, defaultValue = "10") Integer pageSize) {
         return packageService.listFiles(packageType, pageNo, pageSize);
