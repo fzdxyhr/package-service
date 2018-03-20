@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.util.List;
 
 /**
  * @author yhr
@@ -76,5 +75,20 @@ public class PackageController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @RequestMapping(value = "/files/delete", method = RequestMethod.DELETE)
+    public boolean delete(@RequestParam("path") String path) throws Exception {
+        File configFile = new File(path);
+        if (!configFile.exists()) {
+            log.error(configFile.getName() + " is not exist.");
+            return false;
+        }
+        return configFile.delete();
+    }
+
+    @RequestMapping(value = "/files/{package_type}/clear_all", method = RequestMethod.DELETE)
+    public boolean clear(@PathVariable("package_type") Integer packageType) {
+        return packageService.clearAll(packageType);
     }
 }

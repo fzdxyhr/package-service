@@ -29,10 +29,21 @@
 </div>
 
 <div id="main" style="margin-left: 10px;margin-right: 10px;">
-    <div style="margin-bottom: 2%;margin-top: 5px;">
-        <button type="button" class="btn btn-default" @click="queryByNow">立即刷新</button>
-        <button type="button" class="btn btn-default" @click="queryByTimeTask" style="margin-left: 10px;">定时刷新</button>
-        <button type="button" class="btn btn-default" @click="closeTimeTask" style="margin-left: 10px;">关闭定时刷新</button>
+    <div style="margin-bottom: 2%;margin-top: 5px;" class="clearfix">
+        <div style="float: left;">
+            <button type="button" class="btn btn-default" @click="queryByNow">立即刷新</button>
+            <button type="button" class="btn btn-default" @click="queryByTimeTask" style="margin-left: 10px;">定时刷新
+            </button>
+            <button type="button" class="btn btn-default" @click="closeTimeTask" style="margin-left: 10px;">关闭定时刷新
+            </button>
+        </div>
+        <div style="float: right;">
+            <button type="button" class="btn btn-default" @click="clearAllConfirm(1)" style="margin-left: 10px;">清空安装包
+            </button>
+            <button type="button" class="btn btn-default" @click="clearAllConfirm(2)" style="margin-left: 10px;">清空升级包
+            </button>
+        </div>
+
     </div>
     <ul id="myTab" class="nav nav-tabs">
         <li class="active"><a href="#install" data-toggle="tab">安装包列表</a></li>
@@ -57,7 +68,10 @@
                     <td>{{install.file_path}}</td>
                     <td>{{install.file_size}}MB</td>
                     <td>{{install.file_date}}</td>
-                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
+                    <td>
+                        <a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a>
+                        <a href="javascript:void(0)" @click="deleteInstallFile(install.file_path)">删除</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -71,7 +85,8 @@
                 <ul class="pagination">
                     <li :class=" installDisablePre ? 'disabled':''">
                         <a href="javascript:void(0)" v-show="installDisablePre">上一页</a>
-                        <a href="javascript:void(0)" @click="installPrevious" v-show="installDisablePre == false">上一页</a>
+                        <a href="javascript:void(0)" @click="installPrevious"
+                           v-show="installDisablePre == false">上一页</a>
                     </li>
                     <li v-for="index in defaultInstallPagesSize" :class="install_page_no == index ? 'active':''">
                         <a href="javascript:void(0)" @click="installChangePageNo(index)">{{ index }}</a>
@@ -100,7 +115,10 @@
                     <td>{{upgrade.file_path}}</td>
                     <td>{{upgrade.file_size}}MB</td>
                     <td>{{upgrade.file_date}}</td>
-                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
+                    <td>
+                        <a href="javascript:void(0)" @click="downloadFile(upgrade.file_path)">下载</a>
+                        <a href="javascript:void(0)" @click="deleteUpdateFile(upgrade.file_path)">删除</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -110,7 +128,7 @@
             <div style="float: left;margin-top: 22px;font-size: 16px;" v-show="upgrade_items.length > 0">
                 总共&nbsp;&nbsp;{{ total }}&nbsp;&nbsp;记录
             </div>
-            <div style="float: right;display: inline-block;"  v-show="upgrade_items.length > 0">
+            <div style="float: right;display: inline-block;" v-show="upgrade_items.length > 0">
                 <ul class="pagination">
                     <li :class=" disablePre ? 'disabled':''">
                         <a href="javascript:void(0)" v-show="disablePre">上一页</a>
@@ -139,6 +157,25 @@
                 <div class="modal-body">{{ content }}</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal -->
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="warn" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: rgba(8, 21, 28, 0.6);">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">提示</h4>
+                </div>
+                <div class="modal-body">{{ confirmContent }}</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" @click="clearAllInstall">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -179,7 +216,8 @@
             disablePre: true,
             disableNext: false,
             installDisablePre: true,
-            installDisableNext: false
+            installDisableNext: false,
+            confirmContent:""
         },
         mounted: function () {
             this.queryInstallPackage();
@@ -342,7 +380,7 @@
                         } else {
                             self.installPagesSize = parseInt(parseInt(self.install_total) / parseInt(self.install_page_size)) + 1;
                         }
-                        if (self.defaultInstallPagesSize.length > self.installPagesSize) {
+                        if (self.installPagesSize > 0 && self.defaultInstallPagesSize.length > self.installPagesSize) {
                             self.installDisableNext = true;
                             self.installDisablePre = true;
                             self.defaultInstallPagesSize = [];
@@ -369,7 +407,7 @@
                         } else {
                             self.pagesSize = parseInt(parseInt(self.total) / parseInt(self.page_size)) + 1;
                         }
-                        if (self.defaultPagesSize.length > self.pagesSize) {
+                        if (self.pagesSize > 0 && self.defaultPagesSize.length > self.pagesSize) {
                             self.disableNext = true;
                             self.disablePre = true;
                             self.defaultPagesSize = [];
@@ -395,8 +433,91 @@
                     self.queryUpgradePackage();
                 }, 10000);
             },
+            deleteInstallFile: function (path) {
+                let self = this;
+                $.ajax({
+                    type: "DELETE",
+                    url: "/package/v1/files/delete?path=" + path,
+                    success: function (data) {
+                        console.log(data)
+                        if (data) {
+//                            self.content = "文件删除成功";
+//                            $('#myModal').modal('show');
+                            self.queryInstallPackage();
+                        } else {
+                            self.content = "文件删除失败";
+                            $('#myModal').modal('show');
+                        }
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
+            deleteUpdateFile: function (path) {
+                let self = this;
+                $.ajax({
+                    type: "DELETE",
+                    url: "/package/v1/files/delete?path=" + path,
+                    success: function (data) {
+                        if (data) {
+                            self.queryUpgradePackage();
+                        } else {
+                            self.content = "文件删除失败";
+                            $('#myModal').modal('show');
+                        }
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            },
             downloadFile: function (path) {
                 window.location = "/package/v1/files/download?path=" + path;
+            },
+            clearAllConfirm: function (type) {
+                let self = this;
+                if (type == 1) {//安装包
+                    self.confirmContent = "清空安装包后，无法恢复，请确认！";
+                    self.packageType = 1;
+                }
+                if (type == 2) {//升级包
+                    self.confirmContent = "清空升级包后，无法恢复，请确认！";
+                    self.packageType = 2;
+                }
+                $('#warn').modal('show');
+            },
+            clearAllInstall: function () {
+                let self = this;
+                $('#warn').modal('hide');
+                $.ajax({
+                    type: "DELETE",
+                    url: "/package/v1/files/" + self.packageType + "/clear_all",
+                    success: function (data) {
+                        if (data) {
+                            if (self.packageType == 1) {//安装包
+                                self.queryInstallPackage();
+                            }
+                            if (self.packageType == 2) {//升级包
+                                self.queryUpgradePackage();
+                            }
+                        } else {
+                            if (self.packageType == 1) {//安装包
+                                self.content = "安装包清空失败";
+                            }
+                            if (self.packageType == 2) {//升级包
+                                self.content = "升级包清空失败";
+                            }
+                            $('#myModal').modal('show');
+                        }
+
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
             },
             isUrl: function (str_url) {
                 var urlRegExp = /^((https|http|ftp|rtsp|mms)?:\/\/)+[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/;
@@ -419,7 +540,11 @@
                     's+': date.getSeconds()
                 };
                 for (let k in o) {
-                    if (new RegExp(`(${k})`).test(fmt)) {
+                    if (new RegExp(`
+                    (${k})`).
+                    test(fmt)
+                )
+                    {
                         let str = o[k] + '';
                         fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : self.padLeftZero(str));
                     }

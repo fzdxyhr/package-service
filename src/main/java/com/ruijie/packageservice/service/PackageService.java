@@ -3,7 +3,6 @@ package com.ruijie.packageservice.service;
 import com.ruijie.packageservice.vo.FileVo;
 import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -21,5 +20,7 @@ public interface PackageService {
     String readLogs();
 
     ResultVo getResult();
+
+    boolean clearAll(Integer packageType);
 
 }
