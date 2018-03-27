@@ -8,9 +8,12 @@ package com.ruijie.packageservice.constant;
 public class CommonContant {
 
     public final static String FILE_INSTALL_PATH = "/home/file/install";
-//    public final static String FILE_INSTALL_PATH = "D:\\work\\package\\install";
+    //public final static String FILE_INSTALL_PATH = "D:\\work\\package\\install";
 
     public final static String FILE_UPGRADE_PATH = "/home/file/upgrade";
-//    public final static String FILE_UPGRADE_PATH = "D:\\work\\package\\upgrade";
+    //public final static String FILE_UPGRADE_PATH = "D:\\work\\package\\upgrade";
+
+    public final static String ROM_FILE_UPGRADE_PATH = "/home/rom/install";
+
     public final static String LOG_PATH = "/usr/local/tomcat8.0/logs/catalina.out";
 }

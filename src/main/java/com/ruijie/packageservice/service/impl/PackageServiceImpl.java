@@ -87,6 +87,9 @@ public class PackageServiceImpl implements PackageService {
             if (PackageType.UPGRADE.getValue() == packageType) {
                 rootFile = new File(CommonContant.FILE_UPGRADE_PATH);
             }
+            if (PackageType.ROM.getValue() == packageType) {
+                rootFile = new File(CommonContant.ROM_FILE_UPGRADE_PATH);
+            }
             if (!rootFile.isDirectory()) {
                 log.error("指定的路径不是个文件夹");
             } else if (rootFile.isDirectory()) {

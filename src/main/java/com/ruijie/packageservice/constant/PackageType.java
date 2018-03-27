@@ -7,7 +7,7 @@ package com.ruijie.packageservice.constant;
  */
 public enum PackageType {
 
-    INSTALL(1), UPGRADE(2);
+    INSTALL(1), UPGRADE(2), ROM(3);
 
     private Integer value;
 
