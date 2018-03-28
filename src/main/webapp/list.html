@@ -144,7 +144,7 @@
                 </ul>
             </div>
         </div>
-        <div class="tab-pane fade in active" id="rom">
+        <div class="tab-pane fade" id="rom">
             <table class="table table-striped">
                 <thead v-show="rom_install_items.length > 0">
                 <tr>
@@ -278,6 +278,7 @@
         mounted: function () {
             this.queryInstallPackage();
             this.queryUpgradePackage();
+            this.queryRomPackage();
         },
         computed: {
             build: function () {
@@ -518,7 +519,7 @@
                     type: "GET",
                     url: "/package/v1/files/3?page_no=" + self.rom_page_no + "&page_size=" + self.rom_page_size,
                     success: function (data) {
-                        self.rom_items = data.items;
+                        self.rom_install_items = data.items;
                         self.rom_total = data.total;
                         if (parseInt(self.rom_total) % parseInt(self.rom_page_size) == 0) {
                             self.romPagesSize = parseInt(parseInt(self.rom_total) / parseInt(self.rom_page_size));
