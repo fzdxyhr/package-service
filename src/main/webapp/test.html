@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!--&lt;!&ndash; 引入组件库 &ndash;&gt;-->
+    <!--<script src="https://unpkg.com/element-ui/lib/index.js"></script>-->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.min.js"></script>-->
+    <!--https://blog.csdn.net/u012907049/article/details/70237457-->
+</head>
+<body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<div id="test">
+
+    <div id="top">
+            <span style="float:right;">
+                <el-button type="text" @click="add" style="color:white">添加</el-button>
+                <el-button type="text" @click="deletenames" style="color:white">批量删除</el-button>
+            </span>
+    </div>
+
+
+    <br/>
+
+    <div style="margin-top:15px">
+        <el-input placeholder="请输入内容" v-model="criteria" style="padding-bottom:10px;">
+            <el-select v-model="select" slot="prepend" placeholder="请选择">
+                <el-option label="id" value="1"></el-option>
+                <el-option label="name" value="2"></el-option>
+            </el-select>
+            <el-button slot="append" icon="search" v-on:click="search"></el-button>
+        </el-input>
+
+        <el-table
+                ref="testTable"
+                :data="tableData"
+                style="width:100%"
+                border
+                :default-sort="{prop: 'id', order: 'ascending'}"
+                @selection-change="handleSelectionChange"
+                @row-click="handleclick"
+                >
+            <el-table-column type="selection">
+            </el-table-column>
+            <el-table-column
+                    prop="id"
+                    label="Id"
+                    sortable
+                    show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+                    prop="name"
+                    label="姓名"
+                    sortable>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template scope="scope">
+                    <el-button
+                            size="small"
+                            type="primary"
+                            @click="handleEdit(scope.$index, scope.row)">编辑
+                    </el-button>
+                    <el-button
+                            size="small"
+                            type="danger"
+                            @click="handleDelete(scope.$index, scope.row)">删除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </div>
+</div>
+
+<footer align="center">
+    <p>&copy; Vue.js 2.0 + ElementUI分页Demo</p>
+</footer>
+
+<script>
+    var vue = new Vue({
+        el: "#test",
+        data: {
+            //表格当前页数据
+            tableData: [
+                {
+                    "id":"1",
+                    "name":"aaaa"
+                },
+                {
+                    "id":"2",
+                    "name":"bbbb"
+                },
+                {
+                    "id":"3",
+                    "name":"cccc"
+                }
+            ],
+
+            //多选数组
+            multipleSelection: [],
+
+            //请求的URL
+            url: 'newstu/querystudentbypage',
+
+            //搜索条件
+            criteria: '',
+
+            //下拉菜单选项
+            select: '',
+
+            //默认每页数据量
+            pagesize: 10,
+
+            //默认高亮行数据id
+            highlightId: -1,
+
+            //当前页码
+            currentPage: 1,
+
+            //查询的页码
+            start: 1,
+
+            //默认数据总数
+            totalCount: 1000,
+        },
+        methods:{
+            handleEdit:function(index,value){
+                
+            },
+            handleDelete: function (index,val) {
+                
+            },
+            //多选响应
+            handleSelectionChange: function(val) {
+                this.multipleSelection = val;
+            },
+            add: function () {
+
+            },
+            //点击行响应
+            handleclick: function(row, event, column){
+                this.highlightId = row.id;
+            },
+            deletenames: function () {
+                
+            },
+            search: function () {
+                
+            }
+        }
+    });
+</script>
+</body>
+</html>
