@@ -6,6 +6,8 @@ import com.ruijie.packageservice.vo.PackageVo;
 import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,8 @@ import java.net.URLEncoder;
 @RequestMapping("/v1")
 @Slf4j
 public class PackageController {
+
+    Logger logger = LogManager.getLogger(PackageController.class);
 
     @Autowired
     private PackageService packageService;
@@ -90,5 +94,17 @@ public class PackageController {
     @RequestMapping(value = "/files/{package_type}/clear_all", method = RequestMethod.DELETE)
     public boolean clear(@PathVariable("package_type") Integer packageType) {
         return packageService.clearAll(packageType);
+    }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public String test() {
+        String msg = "Spring Boot系列之Log4j2的配置及使用";
+        for (int i = 0; i < 200; i++) {
+            logger.debug(msg);
+            logger.info(msg);
+            logger.warn(msg);
+            logger.error(msg);
+        }
+        return "success";
     }
 }
