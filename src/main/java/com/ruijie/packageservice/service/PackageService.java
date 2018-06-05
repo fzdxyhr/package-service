@@ -23,4 +23,8 @@ public interface PackageService {
 
     boolean clearAll(Integer packageType);
 
+    int upload(String fileName, Integer packageType);
+
+    int getUploadProgress(String fileName);
+
 }

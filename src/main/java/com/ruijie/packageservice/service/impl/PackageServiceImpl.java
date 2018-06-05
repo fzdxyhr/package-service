@@ -5,10 +5,15 @@ import com.ruijie.packageservice.constant.CommonContant;
 import com.ruijie.packageservice.constant.PackageType;
 import com.ruijie.packageservice.service.PackageService;
 import com.ruijie.packageservice.shell.ShellCall;
+import com.ruijie.packageservice.thread.UploadThread;
 import com.ruijie.packageservice.vo.FileVo;
 import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -27,6 +32,17 @@ import java.util.*;
 public class PackageServiceImpl implements PackageService {
 
     public static final Integer LOG_SIZE = 300;
+
+    @Value("${ftp.username}")
+    private String ftpUserName;
+    @Value("${ftp.password}")
+    private String ftpPassword;
+    @Value("${ftp.host}")
+    private String ftpHost;
+    @Value("${ftp.file.path}")
+    private String ftpFilePath;
+    @Value("${local.file.path}")
+    private String localFilePath;
 
     public SimpleDateFormat simpleFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -195,5 +211,52 @@ public class PackageServiceImpl implements PackageService {
             log.error("readfile()   Exception:" + e.getMessage(), e);
         }
         return false;
+    }
+
+    @Override
+    public int upload(String fileName, Integer packageType) {
+        FTPClient ftpClient = new FTPClient();
+        File file = null;
+        FileInputStream fis = null;
+        OutputStream os = null;
+        try {
+            ftpClient.connect(ftpHost);
+            boolean loginResult = ftpClient.login("onc-ads", "ads@RIM7");
+            int returnCode = ftpClient.getReplyCode();
+            if (loginResult && FTPReply.isPositiveCompletion(returnCode)) {// 如果登录成功
+                if (PackageType.INSTALL.getValue() == packageType) {
+                    file = new File(CommonContant.FILE_INSTALL_PATH + "/" + fileName);
+                }
+                if (PackageType.UPGRADE.getValue() == packageType) {
+                    file = new File(CommonContant.FILE_UPGRADE_PATH + "/" + fileName);
+                }
+                ftpClient.makeDirectory(ftpFilePath);
+                // 设置上传目录
+                ftpClient.changeWorkingDirectory(ftpFilePath);
+                ftpClient.setBufferSize(1024);
+                ftpClient.setControlEncoding("UTF-8");
+                ftpClient.enterLocalPassiveMode();
+                fis = new FileInputStream(file);
+                os = ftpClient.storeFileStream(ftpFilePath + fileName);
+                long originFileLength = file.length();
+                UploadThread uploadThread = new UploadThread(ftpClient, os, fis, originFileLength, fileName);
+                uploadThread.start();
+            }
+        } catch (Exception ex) {
+
+        } finally {
+
+        }
+        return 0;
+    }
+
+    @Override
+    public int getUploadProgress(String fileName) {
+        if (StringUtils.isEmpty(fileName)) {
+            return 0;
+        }
+        String key = fileName.split("\\.")[0];
+        int progress = (int) CacheHelper.cacheHelp.asMap().get(key);
+        return progress;
     }
 }

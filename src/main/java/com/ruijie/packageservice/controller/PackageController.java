@@ -13,13 +13,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import sun.net.ftp.FtpClient;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 
 /**
@@ -102,21 +98,16 @@ public class PackageController {
         return packageService.clearAll(packageType);
     }
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public String test() {
-        String msg = "Spring Boot系列之Log4j2的配置及使用";
-        System.out.println(msg);
-        return "success5555";
+    @RequestMapping(value = "/types/{package_type}/files/{file_name}/upload", method = RequestMethod.GET)
+    public int clear(@PathVariable("package_type") Integer packageType, @PathVariable("file_name") String fileName) {
+        return packageService.upload(fileName, packageType);
     }
 
-    @RequestMapping(value = "/test2", method = RequestMethod.GET)
-    public String test2() {
-        String msg = "test2";
-        System.out.println(msg);
-        String response = restTemplate.getForObject("http://:8083/package/v1/test", String.class, new Object[]{});
-        System.out.println("response=" + response);
-        return "test2";
+    @RequestMapping(value = "/files/{file_name}/progress", method = RequestMethod.GET)
+    public int getProgress(@PathVariable("file_name") String fileName) {
+        return packageService.getUploadProgress(fileName);
     }
+
 
     @RequestMapping(value = "/test3", method = RequestMethod.GET)
     public String test3() throws Exception {
@@ -141,8 +132,8 @@ public class PackageController {
 //            ftpClient.storeFile("my_test.txt", fis);
             long originFileLenth = file.length();
             System.out.println("size = " + originFileLenth);
-            byte[] bytes = new byte[1024];
             long progress = 0;
+            byte[] bytes = new byte[1024];
             int length = 0;
             long sum = 0;
             OutputStream os = ftpClient.storeFileStream(remotePath + "my_test4.txt");
