@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>租户管理平台</title>
+    <!--<link rel="stylesheet" href="css/index.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.3.6/lib/theme-chalk/index.css">
+    <!-- import Vue before Element -->
+    <script src="js/vue.min.js"></script>
+    <script src="js/vuex.js"></script>
+    <!-- import JavaScript -->
+    <script src="js/index.js"></script>
+    <script src="js/vue-resource.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="js/require.js"></script>
+    <style>
+        .open {
+            margin-top: 10px;
+            width: auto !important;
+        }
+
+        .el-menu-vertical-demo:not(.el-menu--collapse) {
+            width: 200px;
+            min-height: 670px;
+        }
+
+        .el-main {
+            padding: 10px 5px;
+        }
+        .close {
+            margin-top: 10px;
+            width: auto !important;
+        }
+
+        .main {
+            /*margin-top: 10px;*/
+            margin-left: 5px;
+        }
+
+        .main .el-input__inner {
+            /*width: 190px!important;*/
+        }
+
+        .el-table th, .el-table__footer-wrapper thead div, .el-table__header-wrapper thead div {
+            background: rgba(241, 241, 241, 1) !important;
+        }
+
+        .el-table th, .el-table__footer-wrapper thead, .el-table__header-wrapper thead {
+            border-bottom: solid 1px rgb(215, 215, 215) !important;
+            border-right: solid 1px rgb(215, 215, 215) !important;
+        }
+
+        .el-table tr {
+            border-right: none !important;
+        }
+
+        .main .demo-form-inline .el-form-item {
+            margin-bottom: 10px !important;
+        }
+
+        .contentBody {
+            margin-top: 6px;
+        }
+
+        .el-table td {
+            padding: 5px 0 !important;
+        }
+
+        .el-menu-item.is-active {
+            background-color: rgb(67, 74, 80) !important;
+        }
+
+        .login .el-row {
+            margin-bottom: 20px;
+            margin-left: 15px;
+            width: 350px;
+        }
+
+        .login {
+            text-align: center;
+            width: 380px;
+            height: 300px;
+            margin-top: 10%;
+            margin-left: 40%;
+            box-shadow: darkgrey 0px 0px 30px 5px;
+        }
+
+        .homepage {
+            width: 100%;
+            height: 100%;
+            background-image: url("image/logo_background.png");
+        }
+
+        .indexpage {
+            height: 670px;
+            background-image: url("image/index.jpg");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-color: #c3dff7;
+        }
+        .indexpage span {
+            margin-left: 56%;
+            margin-top: 6%;
+            float: left;
+
+        }
+
+        .tenant .el-dialog .el-input__inner {
+            width: 260px;
+        }
+
+        .tenant .el-dialog .el-form-item {
+            margin-left: 45px;
+        }
+
+        .logo {
+            float: left;
+            margin-top: 15px;
+            margin-left: 60px;
+        }
+        .logo img {
+            float: left;
+            margin-right: 20px;
+        }
+        .logo-content {
+            margin-top: 10px;
+            float:left;
+            color: rgba(0,180,255,1);
+            font-size: 28px;
+            font-weight: bolder;
+        }
+        .logo-content .text {
+            margin-left: 15px;
+        }
+        .logo-content .spilt {
+            border-left: 3px solid rgb(105,93,92);
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <router-view></router-view>
+</div>
+<script>
+    require(["./login.js", "./tenant.js", "./indexpage.js", "./home.js"], function (loginTemplate, tenantTemplate, indexTemplate, homeTemplate) {
+        let loginComp = Vue.component("login", loginTemplate);
+        let tenantComp = Vue.component("tenant", tenantTemplate);
+        let indexComp = Vue.component("index", indexTemplate);
+        let homeComp = Vue.component("home", homeTemplate);
+        const myRoutes = [
+            //当路由地址：地址栏中的那个路径是myLogin访问组件
+            //组件是作为标签来用的所以不能直接在component后面使用
+            //要用返回值
+            //path:''指定地址栏为空：默认为Login页面
+            {path: '/login', component: loginComp},
+            {path: "/", redirect: "/login"},//重定向,指向了home组件
+            {
+                path: "/home", component: homeComp,
+                children: [
+                    {path: "/home/index", component: indexComp, meta: {requireAuth: true}},
+                    {path: "/home/tenant", component: tenantComp, meta: {requireAuth: true}}
+                ]
+            }
+        ];
+        const myRouter = new VueRouter({
+            //myRoutes可以直接用上面的数组替换
+            routes: myRoutes
+        });
+        // 判断是否需要登录权限 以及是否登录
+        myRouter.beforeEach((to, from, next)=> {
+            if (to.matched.some(res =>res.meta.requireAuth)) {// 判断是否需要登录权限
+                // 不含有用户登录数据，判断 localStorage 中的数据是否可以使用
+                const userInfoState = JSON.parse(localStorage.getItem('userInfoState'));
+                const pass = userInfoState && userInfoState.timestamp && new Date().getTime() - userInfoState.timestamp <= 60 * 60 * 1000;
+                if (pass) {// 判断是否登录
+                    next()
+                } else {// 没登录则跳转到登录界面
+                    next({
+                        path: '/login',
+                        query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                    })
+                }
+            } else {
+                next()
+            }
+        });
+        const index = localStorage.getItem("index") == null? "2":localStorage.getItem("index");
+        const store = new Vuex.Store({
+            state: {
+                count: 0,
+                adminleftnavnum:index_copy1 //管理后台左侧导航
+            },
+            mutations: {
+                increment:function(state) {
+                    state.count++
+                }
+            }
+        });
+        var vue = new Vue({
+            router: myRouter,
+            store: store,
+            el: "#app",
+            data: {},
+            methods: {}
+        });
+    });
+</script>
+</body>
+</html>

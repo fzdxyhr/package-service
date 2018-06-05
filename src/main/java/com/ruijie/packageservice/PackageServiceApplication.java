@@ -9,6 +9,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 
@@ -29,5 +30,10 @@ public class PackageServiceApplication extends SpringBootServletInitializer {
 		jacksonConverter.setObjectMapper(objectMapper);
 		HttpMessageConverter<?> converter = jacksonConverter;
 		return new HttpMessageConverters(converter);
+	}
+
+	@Bean
+	public RestTemplate restTemplate() throws Exception {
+		return new RestTemplate();
 	}
 }

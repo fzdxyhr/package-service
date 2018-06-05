@@ -6,16 +6,20 @@ import com.ruijie.packageservice.vo.PackageVo;
 import com.ruijie.packageservice.vo.PagerInfo;
 import com.ruijie.packageservice.vo.ResultVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import sun.net.ftp.FtpClient;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 
 /**
@@ -32,6 +36,8 @@ public class PackageController {
 
     @Autowired
     private PackageService packageService;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @RequestMapping(value = "/package_start", method = RequestMethod.POST)
     public String packageStart(@RequestBody PackageVo packageVo) {
@@ -99,11 +105,57 @@ public class PackageController {
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public String test() {
         String msg = "Spring Boot系列之Log4j2的配置及使用";
-        for (int i = 0; i < 200; i++) {
-            logger.debug(msg);
-            logger.info(msg);
-            logger.warn(msg);
-            logger.error(msg);
+        System.out.println(msg);
+        return "success5555";
+    }
+
+    @RequestMapping(value = "/test2", method = RequestMethod.GET)
+    public String test2() {
+        String msg = "test2";
+        System.out.println(msg);
+        String response = restTemplate.getForObject("http://:8083/package/v1/test", String.class, new Object[]{});
+        System.out.println("response=" + response);
+        return "test2";
+    }
+
+    @RequestMapping(value = "/test3", method = RequestMethod.GET)
+    public String test3() throws Exception {
+        FTPClient ftpClient = new FTPClient();
+        String host = "192.168.5.184";
+        String remotePath = "/data/onc-ads/";
+        String localPath = "D:\\opt\\ftp\\";
+        ftpClient.connect(host);
+        FileInputStream fis = null;
+        boolean loginResult = ftpClient.login("onc-ads", "ads@RIM7");
+        int returnCode = ftpClient.getReplyCode();
+        if (loginResult && FTPReply.isPositiveCompletion(returnCode)) {// 如果登录成功
+            System.out.println("登录FTP服务器成功");
+            ftpClient.makeDirectory(remotePath);
+            // 设置上传目录
+            ftpClient.changeWorkingDirectory(remotePath);
+            ftpClient.setBufferSize(1024);
+            ftpClient.setControlEncoding("UTF-8");
+            ftpClient.enterLocalPassiveMode();
+            File file = new File(localPath + "my_test.txt");
+            fis = new FileInputStream(file);
+//            ftpClient.storeFile("my_test.txt", fis);
+            long originFileLenth = file.length();
+            System.out.println("size = " + originFileLenth);
+            byte[] bytes = new byte[1024];
+            long progress = 0;
+            int length = 0;
+            long sum = 0;
+            OutputStream os = ftpClient.storeFileStream(remotePath + "my_test4.txt");
+            while ((length = fis.read(bytes)) != -1) {
+                sum += length;
+                progress = sum / originFileLenth;
+                os.write(bytes);
+                System.out.println("progress=" + progress);
+            }
+            os.close();
+            fis.close();
+            ftpClient.disconnect();
+
         }
         return "success";
     }
