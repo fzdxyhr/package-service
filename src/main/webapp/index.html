@@ -2,361 +2,207 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ADS打包平台</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="js/jquery-3.2.1.min.js" type="text/javascript"></script>
-    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <title>租户管理平台</title>
+    <!--<link rel="stylesheet" href="css/index.css">-->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.3.6/lib/theme-chalk/index.css">
+    <!-- import Vue before Element -->
     <script src="js/vue.min.js"></script>
+    <script src="js/vuex.js"></script>
+    <!-- import JavaScript -->
+    <script src="js/index.js"></script>
+    <script src="js/vue-resource.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="js/require.js"></script>
     <style>
-        body {
-            color: white;
-            background: url("image/back.jpg") repeat-y center top;
+        .open {
+            margin-top: 10px;
+            width: auto !important;
         }
 
-        .input_class {
-            background-color: rgba(16, 27, 29, 0.5);
-            color: white;
-            border-color: rgba(16, 27, 29, 0.5);
+        .el-menu-vertical-demo:not(.el-menu--collapse) {
+            width: 200px;
+            min-height: 670px;
+        }
+
+        .el-main {
+            padding: 10px 5px;
+        }
+        .close {
+            margin-top: 10px;
+            width: auto !important;
+        }
+
+        .main {
+            /*margin-top: 10px;*/
+            margin-left: 5px;
+        }
+
+        .main .el-input__inner {
+            /*width: 190px!important;*/
+        }
+
+        .el-table th, .el-table__footer-wrapper thead div, .el-table__header-wrapper thead div {
+            background: rgba(241, 241, 241, 1) !important;
+        }
+
+        .el-table th, .el-table__footer-wrapper thead, .el-table__header-wrapper thead {
+            border-bottom: solid 1px rgb(215, 215, 215) !important;
+            border-right: solid 1px rgb(215, 215, 215) !important;
+        }
+
+        .el-table tr {
+            border-right: none !important;
+        }
+
+        .main .demo-form-inline .el-form-item {
+            margin-bottom: 10px !important;
+        }
+
+        .contentBody {
+            margin-top: 6px;
+        }
+
+        .el-table td {
+            padding: 5px 0 !important;
+        }
+
+        .el-menu-item.is-active {
+            background-color: rgb(67, 74, 80) !important;
+        }
+
+        .login .el-row {
+            margin-bottom: 20px;
+            margin-left: 15px;
+            width: 350px;
+        }
+
+        .login {
+            text-align: center;
+            width: 380px;
+            height: 300px;
+            margin-top: 10%;
+            margin-left: 40%;
+            box-shadow: darkgrey 0px 0px 30px 5px;
+        }
+
+        .homepage {
+            width: 100%;
+            height: 100%;
+            background-image: url("image/logo_background.png");
+        }
+
+        .indexpage {
+            height: 670px;
+            background-image: url("image/index.jpg");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-color: #c3dff7;
+        }
+        .indexpage span {
+            margin-left: 56%;
+            margin-top: 6%;
+            float: left;
+
+        }
+
+        .tenant .el-dialog .el-input__inner {
+            width: 260px;
+        }
+
+        .tenant .el-dialog .el-form-item {
+            margin-left: 45px;
+        }
+
+        .logo {
+            float: left;
+            margin-top: 15px;
+            margin-left: 60px;
+        }
+        .logo img {
+            float: left;
+            margin-right: 20px;
+        }
+        .logo-content {
+            margin-top: 10px;
+            float:left;
+            color: rgba(0,180,255,1);
+            font-size: 28px;
+            font-weight: bolder;
+        }
+        .logo-content .text {
+            margin-left: 15px;
+        }
+        .logo-content .spilt {
+            border-left: 3px solid rgb(105,93,92);
         }
     </style>
 </head>
 <body>
-<!--<div style="position:absolute; width:100%; height:100%; z-index:-1">-->
-    <!--<img src="image/back.jpg" height="100%" width="100%"/>-->
-<!--</div>-->
-<div align="center" style="margin-bottom: 5%;margin-top: 5px;">
-    <h2>ADS打包平台</h2>
-</div>
-<div id="main">
-    <form role="form">
-        <div class="form-group" style="margin-left: 35%;">
-            <label for="svn_url">SVN地址:</label>
-            <input type="text" class="form-control input-sm input_class" style="width: 45%;" id="svn_url" v-model="svn_url"
-                   placeholder="请输入SVN地址">
-        </div>
-        <div class="form-group" style="margin-left: 35%;">
-            <label for="build">Build:</label>
-            <input type="text" class="form-control input-sm input_class" style="width: 45%;margin-bottom:3px;"
-                   id="build"
-                   placeholder="请输入Build号" v-model="build">
-        </div>
-        <div class="form-group" style="margin-left: 35%;">
-            <label for="version">Version:</label>
-            <input type="text" class="form-control input-sm input_class" style="width: 45%;margin-bottom:3px;"
-                   id="version"
-                   placeholder="请输入version号" v-model="version">
-        </div>
-        <div class="form-group" style="margin-left: 35%;">
-            <label style="display: inline-block;">
-                打包类型:
-            </label>
-            <label class="radio" style="display: inline-block;margin-left: 40px;color: red;">
-                <input type="radio" name="optionsRadios" id="optionsRadios1" value="1" v-model="packageType" :checked="packageType == 1"> 安装包
-            </label>
-            <label class="radio" style="display: inline-block;margin-left: 35px;color: red;">
-                <input type="radio" name="optionsRadios" id="optionsRadios2" value="2" v-model="packageType" :checked="packageType == 2">升级包
-            </label>
-            <button type="button" class="btn btn-default input_class" @click="startPackage" style="display: inline-block;margin-left: 14.7%;"
-                    :disabled="startPackageDisable">开始打包
-            </button>
-        </div>
-    </form>
-    <ul id="myTab" class="nav nav-tabs">
-        <li class="active">
-            <a href="#log" data-toggle="tab">实时日志</a>
-        </li>
-        <li><a href="#install" data-toggle="tab">安装包列表</a></li>
-        <li><a href="#upgrade" data-toggle="tab">升级包列表</a></li>
-
-    </ul>
-    <div id="myTabContent" class="tab-content">
-        <div class="tab-pane fade in active" id="log">
-            <textarea style="background-color: rgba(8, 21, 29, 0.7); color:white; margin-top: 10px; margin-left:5px; width: 99.3%;"
-                    class="form-control" rows="15" v-model="log_content" disabled="true" placeholder="暂无日志"></textarea>
-        </div>
-        <div class="tab-pane fade" id="install">
-            <table class="table table-striped">
-                <thead v-show="install_items.length > 0">
-                <tr>
-                    <th>安装包名称</th>
-                    <th>安装包路径</th>
-                    <th>安装包大小</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody v-for="install in install_items" v-show="install_items.length > 0">
-                <tr style="background-color: rgba(8, 21, 29, 0.7);">
-                    <td>{{install.file_name}}</td>
-                    <td>{{install.file_path}}</td>
-                    <td>{{install.file_size}}MB</td>
-                    <td>{{install.file_date}}</td>
-                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
-                </tr>
-                </tbody>
-            </table>
-            <div v-show="install_items.length == 0">
-                <div align="center" style="margin-top: 10%;">暂无数据</div>
-            </div>
-        </div>
-        <div class="tab-pane fade" id="upgrade">
-            <table class="table table-striped">
-                <thead v-show="upgrade_items.length > 0">
-                <tr>
-                    <th>升级包名称</th>
-                    <th>升级包路径</th>
-                    <th>升级包大小</th>
-                    <th>创建时间</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody v-for="upgrade in upgrade_items" v-show="upgrade_items.length > 0">
-                <tr style="background-color: rgba(8, 21, 29, 0.7);">
-                    <td>{{upgrade.file_name}}</td>
-                    <td>{{upgrade.file_path}}</td>
-                    <td>{{upgrade.file_size}}MB</td>
-                    <td>{{upgrade.file_date}}</td>
-                    <td><a href="javascript:void(0)" @click="downloadFile(install.file_path)">下载</a></td>
-                </tr>
-                </tbody>
-            </table>
-            <div v-show="upgrade_items.length == 0">
-                <div align="center" style="margin-top: 10%;">暂无数据</div>
-            </div>
-        </div>
-    </div>
-    <!-- 模态框（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content" style="background-color: rgba(8, 21, 28, 0.6);">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">提示</h4>
-                </div>
-                <div class="modal-body">{{ content }}</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div>
+<div id="app">
+    <router-view></router-view>
 </div>
 <script>
-    $(function () {
-        $('#myTab li:eq(0) a').tab('show');
-    });
-    var vue = new Vue({
-        el: '#main',
-        data: {
-            svn_url:"",
-//            build:"",
-            version:"",
-            packageType:1,
-            content:"",
-            queryLogJobId: 0,
-            queryInstallJobId: 0,
-            queryUpgradeJobId: 0,
-            queryResultJobId:0,
-            startPackageDisable: false,
-            log_content: "",
-            status: false,
-            upgrade_items: [],
-            install_items: [],
-            resultObj:{}
-        },
-        computed:{
-            build : function(){
-                let date = new Date();
-                return this.formatDate(date,"yyyyMMdd");
+    require(["./login.js", "./tenant.js", "./indexpage.js", "./home.js"], function (loginTemplate, tenantTemplate, indexTemplate, homeTemplate) {
+        let loginComp = Vue.component("login", loginTemplate);
+        let tenantComp = Vue.component("tenant", tenantTemplate);
+        let indexComp = Vue.component("index", indexTemplate);
+        let homeComp = Vue.component("home", homeTemplate);
+        const myRoutes = [
+            //当路由地址：地址栏中的那个路径是myLogin访问组件
+            //组件是作为标签来用的所以不能直接在component后面使用
+            //要用返回值
+            //path:''指定地址栏为空：默认为Login页面
+            {path: '/login', component: loginComp},
+            {path: "/", redirect: "/login"},//重定向,指向了home组件
+            {
+                path: "/home", component: homeComp,
+                children: [
+                    {path: "/home/index", component: indexComp, meta: {requireAuth: true}},
+                    {path: "/home/tenant", component: tenantComp, meta: {requireAuth: true}}
+                ]
             }
-        },
-        methods: {
-            validateInput:function(){
-                let self = this;
-                if (self.svn_url === ''){
-                    self.content = "请输入SVN地址";
-                    $('#myModal').modal('show');
-                    return false;
+        ];
+        const myRouter = new VueRouter({
+            //myRoutes可以直接用上面的数组替换
+            routes: myRoutes
+        });
+        // 判断是否需要登录权限 以及是否登录
+        myRouter.beforeEach((to, from, next)=> {
+            if (to.matched.some(res =>res.meta.requireAuth)) {// 判断是否需要登录权限
+                // 不含有用户登录数据，判断 localStorage 中的数据是否可以使用
+                const userInfoState = JSON.parse(localStorage.getItem('userInfoState'));
+                const pass = userInfoState && userInfoState.timestamp && new Date().getTime() - userInfoState.timestamp <= 60 * 60 * 1000;
+                if (pass) {// 判断是否登录
+                    next()
+                } else {// 没登录则跳转到登录界面
+                    next({
+                        path: '/login',
+                        query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+                    })
                 }
-                if (!self.isUrl(self.svn_url)){
-                    self.content = "SVN地址不合法，请检验后重新输入";
-                    $('#myModal').modal('show');
-                    return false;
-                }
-                if (self.build === ''){
-                    self.content = "请输入Build号";
-                    $('#myModal').modal('show');
-                    return false;
-                }
-                if (self.version === ''){
-                    self.content = "请输入version号";
-                    $('#myModal').modal('show');
-                    return false;
-                }
-                return true;
-            },
-            runPackage: function () {
-                let self = this;
-                var data = {};
-                var package_type = [];
-                data.svn_url = self.svn_url;
-                data.build = self.build;
-                data.version = self.version;
-                package_type.push(self.packageType);
-                data.package_type = package_type;
-                $.ajax({
-                    type: "POST",
-                    url: "/package/v1/package_start",
-                    contentType:"application/json",
-                    data: JSON.stringify(data),
-                    success: function (data) {
-
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            startPackage: function () {
-                let self = this;
-                if(!self.validateInput()) {
-                    return;
-                }
-                self.startPackageDisable = true;
-                self.runPackage();
-                self.queryLogs();
-                self.queryLogTimeTask();
-                self.queryUpgradePackageByTime();
-                self.queryInstallPackageByTime();
-                self.queryResultTimeTask();
-            },
-            queryLogTimeTask: function () {
-                let self = this;
-                self.queryLogJobId = window.setInterval(function () {
-                    self.queryLogs();
-                }, 5000);
-            },
-            queryLogs: function () {
-                let self = this;
-                $.ajax({
-                    type: "GET",
-                    url: "/package/v1/logs",
-                    success: function (data) {
-                        self.log_content = data;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            queryInstallPackage: function () {
-                let self = this;
-                $.ajax({
-                    type: "GET",
-                    url: "/package/v1/files/1",
-                    success: function (data) {
-                        self.install_items = data;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            queryInstallPackageByTime: function () {
-                let self = this;
-                window.setInterval(function(){
-                    self.queryInstallPackage();
-                },10000);
-            },
-            queryUpgradePackage: function () {
-                let self = this;
-                $.ajax({
-                    type: "GET",
-                    url: "/package/v1/files/2",
-                    success: function (data) {
-//                        var message = $.parseJSON(data);//后台返回的json数据需要转为对象
-                        self.upgrade_items = data;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            queryUpgradePackageByTime: function () {
-                let self = this;
-                window.setInterval(function () {
-                    self.queryUpgradePackage();
-                },10000);
-            },
-            queryResult: function () {
-                let self = this;
-                $.ajax({
-                    type: "GET",
-                    url: "/package/v1/result",
-                    success: function (data) {
-                        self.resultObj = data;
-                        var installResult = false;
-                        var upgradeResult = false;
-                        if(self.resultObj.install_result == 1) {
-                            installResult = true;
-                            window.clearInterval(self.queryInstallJobId);
-                        }
-                        if(self.resultObj.upgrade_result == 1) {
-                            upgradeResult = true;
-                            window.clearInterval(self.queryUpgradeJobId);
-                        }
-                        if(installResult && upgradeResult) {
-                            window.clearInterval(self.queryLogJobId);
-                            window.clearInterval(self.queryResultJobId);
-                        }
-
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            queryResultTimeTask: function () {
-                let self = this;
-                self.queryResultJobId = window.setInterval(function(){
-                    self.queryResult();
-                },10000);
-            },
-            downloadFile: function (path) {
-                window.location = "/package/v1/files/download?path=" + path;
-            },
-            isUrl:function(str_url){
-                var urlRegExp=/^((https|http|ftp|rtsp|mms)?:\/\/)+[A-Za-z0-9]+\.[A-Za-z0-9]+[\/=\?%\-&_~`@[\]\':+!]*([^<>\"\"])*$/;
-                if (urlRegExp.test(str_url)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            },
-            formatDate:function(date, fmt){
-                let self = this;
-                if (/(y+)/.test(fmt)) {
-                    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
-                }
-                let o = {
-                    'M+': date.getMonth() + 1,
-                    'd+': date.getDate(),
-                    'h+': date.getHours(),
-                    'm+': date.getMinutes(),
-                    's+': date.getSeconds()
-                };
-                for (let k in o) {
-                    if (new RegExp(`(${k})`).test(fmt)) {
-                        let str = o[k] + '';
-                        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : self.padLeftZero(str));
-                    }
-                }
-                return fmt;
-            },
-            padLeftZero:function(str){
-                return ('00' + str).substr(str.length);
+            } else {
+                next()
             }
-        }
+        });
+        const index = localStorage.getItem("index") == null? "2":localStorage.getItem("index");
+        const store = new Vuex.Store({
+            state: {
+                count: 0,
+                adminleftnavnum:index //管理后台左侧导航
+            },
+            mutations: {
+                increment:function(state) {
+                    state.count++
+                }
+            }
+        });
+        var vue = new Vue({
+            router: myRouter,
+            store: store,
+            el: "#app",
+            data: {},
+            methods: {}
+        });
     });
 </script>
 </body>
